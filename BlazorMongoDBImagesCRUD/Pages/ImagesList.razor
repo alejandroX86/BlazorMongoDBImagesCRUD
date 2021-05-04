@@ -1,0 +1,78 @@
+﻿@page "/"
+@using Data
+@using MongoDB.Bson
+
+@inject IImageService ImageService
+@inject NavigationManager NavigationManager 
+
+<h3>ImagesList</h3>
+
+
+@if (images == null)
+{
+
+    <p><em>Loading........</em></p>
+}
+else
+{
+
+    @foreach (var item in images)
+    {
+
+        <div class="card" style="width:30rem;">
+
+            <div class="card-body">
+             <img class="rounded m-1" src="@item.Url"/>
+
+             <input type="button" class="btn-succes" value="Delete" @onclick="@(() => Delete(item.Id
+                                                                                ))" />
+
+            </div>
+
+
+
+        </div>
+
+    }
+
+
+
+}
+
+
+@code {
+
+    private IEnumerable<StorableImage> images;
+    private string ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+
+            images = await ImageService.GetAllImages();
+
+        }
+
+        catch (Exception e)
+        {
+
+            ErrorMessage = e.Message;
+
+        }
+
+
+    }
+
+
+
+    protected async void Delete(ObjectId id)
+    {
+
+        await ImageService.DeleteImage(id);
+
+        NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+
+}
